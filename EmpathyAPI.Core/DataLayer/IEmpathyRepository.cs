@@ -8,6 +8,6 @@ namespace EmpathyAPI.Core.DataLayer
 {
     public interface IEmpathyRepository : IDisposable
     {
-        Task<Profile> GetUserProfile(string userId, string ChannelAccessToken);
+        Task<Profile> GetUserProfile(string userId);
     }
 }

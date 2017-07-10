@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using EmpathyAPI.Core.DataLayer;
 using EmpathyAPI.Core.EntityLayer;
+using Microsoft.Extensions.Options;
 
 namespace EmpathyAPI.Controllers
 {
@@ -14,14 +15,15 @@ namespace EmpathyAPI.Controllers
     public class EmpathyController : Controller
     {
         private IEmpathyRepository _IEmpathyRepository;
-        public EmpathyController()
+
+        public EmpathyController(IEmpathyRepository IEmpathyRepository)
         {
-            _IEmpathyRepository = new EmpathyRepository();
+            _IEmpathyRepository = IEmpathyRepository;
         }
         [Route("GetUserProfile")]
-        public Task<Profile> GetUserProfile(string userId, string AccessToken)
+        public Task<Profile> GetUserProfile(string userId)
         {
-            return _IEmpathyRepository.GetUserProfile(userId, AccessToken);
+            return _IEmpathyRepository.GetUserProfile(userId);
         }
     }
 }
