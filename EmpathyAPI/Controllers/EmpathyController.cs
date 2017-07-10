@@ -20,7 +20,7 @@ namespace EmpathyAPI.Controllers
         {
             _IEmpathyRepository = IEmpathyRepository;
         }
-        [Route("GetUserProfile")]
+        [Route("GetUserProfile/{userId}")]
         public Task<Profile> GetUserProfile(string userId)
         {
             return _IEmpathyRepository.GetUserProfile(userId);
