@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using EmpathyAPI.Core.DataLayer;
 
 namespace EmpathyAPI
 {
@@ -29,6 +30,8 @@ namespace EmpathyAPI
         {
             // Add framework services.
             services.AddMvc();
+
+            services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

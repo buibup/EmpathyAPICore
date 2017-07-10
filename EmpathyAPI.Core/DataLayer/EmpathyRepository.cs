@@ -5,11 +5,21 @@ using System.Threading.Tasks;
 using EmpathyAPI.Core.EntityLayer;
 using System.Net.Http;
 using Newtonsoft.Json;
+using System.IO;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace EmpathyAPI.Core.DataLayer
 {
     public class EmpathyRepository : IEmpathyRepository
     {
+        private readonly IOptions<AppSettings> _appSettings;
+
+        public EmpathyRepository()
+        {
+
+        }
+
         public void Dispose()
         {
             throw new NotImplementedException();
@@ -19,7 +29,6 @@ namespace EmpathyAPI.Core.DataLayer
         {
             string TokenString = $"Bearer {ChannelAccessToken}";
             string Url = AppSettings.LineProfile;
-
             string WEBSERVICE_URL = Url + userId;
 
             HttpClient client = new HttpClient();
