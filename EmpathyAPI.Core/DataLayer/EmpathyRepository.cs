@@ -7,6 +7,7 @@ using System.Net.Http;
 using Newtonsoft.Json;
 using System.IO;
 using Microsoft.Extensions.Options;
+using System.Diagnostics;
 
 namespace EmpathyAPI.Core.DataLayer
 {
@@ -46,8 +47,15 @@ namespace EmpathyAPI.Core.DataLayer
             {
                 client.DefaultRequestHeaders.Add("Authorization", TokenString);
                 client.BaseAddress = new Uri(WEBSERVICE_URL);
+                // get response time
+                Stopwatch timer = new Stopwatch();
+                timer.Start();
 
                 HttpResponseMessage response = client.GetAsync(WEBSERVICE_URL).Result;
+
+                timer.Stop();
+                TimeSpan timeTaken = timer.Elapsed;
+
                 string res = "";
                 using (HttpContent content = response.Content)
                 {
