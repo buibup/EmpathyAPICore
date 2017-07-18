@@ -47,6 +47,39 @@ namespace EmpathyAPI.Core.DataLayer
             {
                 client.DefaultRequestHeaders.Add("Authorization", TokenString);
                 client.BaseAddress = new Uri(WEBSERVICE_URL);
+                
+                HttpResponseMessage response = client.GetAsync(WEBSERVICE_URL).Result;
+                
+                string res = "";
+                using (HttpContent content = response.Content)
+                {
+                    // ... Read the string.
+                    var result = content.ReadAsStringAsync();
+                    res = result.Result;
+                }
+                
+                var profile = Task.Run(() => JsonConvert.DeserializeObject<Profile>(res));
+
+                return profile;
+            }
+            catch (Exception)
+            {
+                return Task.Run(() => new Profile());
+            }
+        }
+
+        public Tuple<Task<Profile>, Task<TimeSpan>> GetUserProfileTimeSpan(string userId)
+        {
+            string TokenString = $"Bearer {GetChannelAccessToken()}";
+            string Url = GetLineProfileUri();
+            string WEBSERVICE_URL = Url + userId;
+
+            HttpClient client = new HttpClient();
+
+            try
+            {
+                client.DefaultRequestHeaders.Add("Authorization", TokenString);
+                client.BaseAddress = new Uri(WEBSERVICE_URL);
                 // get response time
                 Stopwatch timer = new Stopwatch();
                 timer.Start();
@@ -54,7 +87,7 @@ namespace EmpathyAPI.Core.DataLayer
                 HttpResponseMessage response = client.GetAsync(WEBSERVICE_URL).Result;
 
                 timer.Stop();
-                TimeSpan timeTaken = timer.Elapsed;
+                var timeTaken = Task.Run(() => timer.Elapsed);
 
                 string res = "";
                 using (HttpContent content = response.Content)
@@ -67,13 +100,14 @@ namespace EmpathyAPI.Core.DataLayer
 
                 var profile = Task.Run(() => JsonConvert.DeserializeObject<Profile>(res));
 
-                return profile;
+                return new Tuple<Task<Profile>, Task<TimeSpan>>(profile, timeTaken);
             }
             catch (Exception)
             {
-                return Task.Run(() => new Profile());
+                var p = Task.Run(() => new Profile());
+                var t = Task.Run(() => new TimeSpan());
+                return new Tuple<Task<Profile>, Task<TimeSpan>>(p, t);
             }
-            
         }
     }
 }

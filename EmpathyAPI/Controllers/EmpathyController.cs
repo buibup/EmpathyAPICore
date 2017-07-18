@@ -25,5 +25,10 @@ namespace EmpathyAPI.Controllers
         {
             return _IEmpathyRepository.GetUserProfile(userId);
         }
+        [Route("GetUserProfileTimeSpan/{userId}")]
+        public Tuple<Task<Profile>, Task<TimeSpan>> GetUserProfileTimeSpan(string userId)
+        {
+            return _IEmpathyRepository.GetUserProfileTimeSpan(userId);
+        }
     }
 }
