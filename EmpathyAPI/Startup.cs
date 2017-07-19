@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using EmpathyAPI.Core.DataLayer;
+using Newtonsoft.Json.Serialization;
 
 namespace EmpathyAPI
 {
@@ -29,7 +30,9 @@ namespace EmpathyAPI
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
-            services.AddMvc();
+            services
+                .AddMvc()
+                .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
 
             // Regis service
             services.Configure<LineServiceSettings>(Configuration.GetSection("LineServiceSettings"));
