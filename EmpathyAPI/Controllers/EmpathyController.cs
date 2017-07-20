@@ -30,5 +30,11 @@ namespace EmpathyAPI.Controllers
         {
             return _IEmpathyRepository.GetUserProfileTimeSpan(userId);
         }
+
+        [Route("GetUserProfileImageString/{userId}")]
+        public Task<Profile> GetUserProfileImageString(string userId)
+        {
+            return _IEmpathyRepository.GetUserProfileImageString(userId);
+        }
     }
 }

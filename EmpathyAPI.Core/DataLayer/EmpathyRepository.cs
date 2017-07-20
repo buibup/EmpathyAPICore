@@ -109,5 +109,106 @@ namespace EmpathyAPI.Core.DataLayer
                 return new Tuple<Task<Profile>, Task<TimeSpan>>(p, t);
             }
         }
+
+        public Task<Profile> GetUserProfileImageString(string userId)
+        {
+            string TokenString = $"Bearer {GetChannelAccessToken()}";
+            string Url = GetLineProfileUri();
+            string WEBSERVICE_URL = Url + userId;
+
+            HttpClient client = new HttpClient();
+
+            try
+            {
+                client.DefaultRequestHeaders.Add("Authorization", TokenString);
+                client.BaseAddress = new Uri(WEBSERVICE_URL);
+
+                HttpResponseMessage response = client.GetAsync(WEBSERVICE_URL).Result;
+
+                string res = "";
+                using (HttpContent content = response.Content)
+                {
+                    // ... Read the string.
+                    var result = content.ReadAsStringAsync();
+                    res = ConvertImageUrlToString(result.Result);
+                }
+
+                var profile = Task.Run(() => JsonConvert.DeserializeObject<Profile>(res));
+
+                return profile;
+            }
+            catch (Exception ex)
+            {
+                return Task.Run(() => new Profile());
+            }
+        }
+
+        private string ConvertImageUrlToString(string resultLineInfo)
+        {
+            Profile profile = JsonConvert.DeserializeObject<Profile>(resultLineInfo);
+            
+            //using (var memoryStream = new MemoryStream())
+            //{
+            //    DownloadImage(profile.PictureUrl).CopyTo(memoryStream);
+            //    byte[] imageArray = memoryStream.ToArray();
+
+            //    profile.PictureUrl = Convert.ToBase64String(imageArray);
+            //}
+
+            using (var client = new HttpClient())
+            {
+                using (HttpResponseMessage response = client.GetAsync(profile.PictureUrl, HttpCompletionOption.ResponseHeadersRead).Result)
+                {
+                    response.EnsureSuccessStatusCode();
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        //using (Stream contentStream = response.Content.ReadAsStreamAsync().Result, fileStream = new FileStream("tempImage" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".png", FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
+                        using (Stream contentStream = response.Content.ReadAsStreamAsync().Result)
+                        {
+                            contentStream.CopyTo(memoryStream);
+                            byte[] imageArray = memoryStream.ToArray();
+
+                            profile.PictureUrl = Convert.ToBase64String(imageArray);
+                        }
+                    }
+                    
+                }
+            }
+
+            return JsonConvert.SerializeObject(profile);
+        }
+
+        private Stream DownloadImage(string url)
+        {
+            using (var client = new HttpClient())
+            {
+                using (HttpResponseMessage response = client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).Result)
+                {
+                    response.EnsureSuccessStatusCode();
+
+                    using (Stream contentStream = response.Content.ReadAsStreamAsync().Result, fileStream = new FileStream("tempImage" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".png", FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
+                    {
+                        var buffer = new byte[8192];
+                        var isMoreToRead = true;
+
+                        do
+                        {
+                            var read = contentStream.ReadAsync(buffer, 0, buffer.Length).Result;
+                            if (read == 0)
+                            {
+                                isMoreToRead = false;
+                            }
+                            else
+                            {
+                                fileStream.WriteAsync(buffer, 0, read);
+                            }
+                        }
+                        while (isMoreToRead);
+
+                        return contentStream;
+                    }
+                }
+            }
+        }
     }
 }

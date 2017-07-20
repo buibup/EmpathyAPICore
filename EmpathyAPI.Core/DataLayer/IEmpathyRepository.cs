@@ -11,5 +11,7 @@ namespace EmpathyAPI.Core.DataLayer
 
         Task<Profile> GetUserProfile(string userId);
         Tuple<Task<Profile>, Task<TimeSpan>> GetUserProfileTimeSpan(string userId);
+
+        Task<Profile> GetUserProfileImageString(string userId);
     }
 }
