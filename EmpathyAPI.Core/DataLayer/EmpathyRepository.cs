@@ -147,14 +147,6 @@ namespace EmpathyAPI.Core.DataLayer
         {
             Profile profile = JsonConvert.DeserializeObject<Profile>(resultLineInfo);
             
-            //using (var memoryStream = new MemoryStream())
-            //{
-            //    DownloadImage(profile.PictureUrl).CopyTo(memoryStream);
-            //    byte[] imageArray = memoryStream.ToArray();
-
-            //    profile.PictureUrl = Convert.ToBase64String(imageArray);
-            //}
-
             using (var client = new HttpClient())
             {
                 using (HttpResponseMessage response = client.GetAsync(profile.PictureUrl, HttpCompletionOption.ResponseHeadersRead).Result)
@@ -162,7 +154,6 @@ namespace EmpathyAPI.Core.DataLayer
                     response.EnsureSuccessStatusCode();
                     using (var memoryStream = new MemoryStream())
                     {
-                        //using (Stream contentStream = response.Content.ReadAsStreamAsync().Result, fileStream = new FileStream("tempImage" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".png", FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
                         using (Stream contentStream = response.Content.ReadAsStreamAsync().Result)
                         {
                             contentStream.CopyTo(memoryStream);
@@ -177,38 +168,6 @@ namespace EmpathyAPI.Core.DataLayer
 
             return JsonConvert.SerializeObject(profile);
         }
-
-        private Stream DownloadImage(string url)
-        {
-            using (var client = new HttpClient())
-            {
-                using (HttpResponseMessage response = client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).Result)
-                {
-                    response.EnsureSuccessStatusCode();
-
-                    using (Stream contentStream = response.Content.ReadAsStreamAsync().Result, fileStream = new FileStream("tempImage" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".png", FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
-                    {
-                        var buffer = new byte[8192];
-                        var isMoreToRead = true;
-
-                        do
-                        {
-                            var read = contentStream.ReadAsync(buffer, 0, buffer.Length).Result;
-                            if (read == 0)
-                            {
-                                isMoreToRead = false;
-                            }
-                            else
-                            {
-                                fileStream.WriteAsync(buffer, 0, read);
-                            }
-                        }
-                        while (isMoreToRead);
-
-                        return contentStream;
-                    }
-                }
-            }
-        }
+        
     }
 }

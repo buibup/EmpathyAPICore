@@ -11,7 +11,6 @@ using Microsoft.Extensions.Options;
 namespace EmpathyAPI.Controllers
 {
     [Produces("application/json")]
-    [Route("api/Empathy")]
     public class EmpathyController : Controller
     {
         private IEmpathyRepository _IEmpathyRepository;
@@ -20,18 +19,17 @@ namespace EmpathyAPI.Controllers
         {
             _IEmpathyRepository = IEmpathyRepository;
         }
-        [Route("GetUserProfile/{userId}")]
+
         public Task<Profile> GetUserProfile(string userId)
         {
             return _IEmpathyRepository.GetUserProfile(userId);
         }
-        [Route("GetUserProfileTimeSpan/{userId}")]
+
         public Tuple<Task<Profile>, Task<TimeSpan>> GetUserProfileTimeSpan(string userId)
         {
             return _IEmpathyRepository.GetUserProfileTimeSpan(userId);
         }
 
-        [Route("GetUserProfileImageString/{userId}")]
         public Task<Profile> GetUserProfileImageString(string userId)
         {
             return _IEmpathyRepository.GetUserProfileImageString(userId);
